@@ -173,7 +173,11 @@ int main(int argc, char **argv)
     QCoreApplication app(argc, argv);
 
     QCommandLineParser cmdLineParser;
-    const QString appDesc = QString::asprintf("Qt Lightmap Denoiser (using OpenImageDenoise)", qVersion());
+    const QString appDesc = QString::asprintf("Qt Lightmap Denoiser %s (using OpenImageDenoise %d.%d.%d)",
+                                              qVersion(),
+                                              OIDN_VERSION_MAJOR,
+                                              OIDN_VERSION_MINOR,
+                                              OIDN_VERSION_PATCH);
     cmdLineParser.setApplicationDescription(appDesc);
     app.setApplicationVersion(QLatin1String(QT_VERSION_STR));
     cmdLineParser.addHelpOption();
