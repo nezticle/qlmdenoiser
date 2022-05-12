@@ -2,3 +2,5 @@ Command line tool using OpenImageDenoise https://www.openimagedenoise.org/ to de
 
 TODO only Windows is supported now. Run prepare_deps.bat first. Then qt-cmake-private -CMAKE_BUILD_TYPE=Release . and ninja.
 This gives a qlmdenoiser.exe with the 3rd party dependencies linked in statically.
+
+Once this is done, bake lightmaps and run "qlmdenoiser qlm_list.txt" which will process and replace all the .exr files with denoised ones.
