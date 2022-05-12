@@ -10,10 +10,12 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt6 COMPONENTS Core)
 find_package(Qt6 COMPONENTS Gui)
 
-find_library(OPENIMAGEDENOISE_LIBRARY1 NAMES tbb PATHS "deps/lib" NO_DEFAULT_PATH)
-find_library(OPENIMAGEDENOISE_LIBRARY2 NAMES common PATHS "deps/lib" NO_DEFAULT_PATH)
-find_library(OPENIMAGEDENOISE_LIBRARY3 NAMES dnnl PATHS "deps/lib" NO_DEFAULT_PATH)
-find_library(OPENIMAGEDENOISE_LIBRARY4 NAMES OpenImageDenoise PATHS "deps/lib" NO_DEFAULT_PATH)
+set(DEP_LIB_LOCATION "build/install/lib")
+
+find_library(OPENIMAGEDENOISE_LIBRARY1 NAMES tbb PATHS ${DEP_LIB_LOCATION} NO_DEFAULT_PATH)
+find_library(OPENIMAGEDENOISE_LIBRARY2 NAMES common PATHS ${DEP_LIB_LOCATION} NO_DEFAULT_PATH)
+find_library(OPENIMAGEDENOISE_LIBRARY3 NAMES dnnl PATHS ${DEP_LIB_LOCATION} NO_DEFAULT_PATH)
+find_library(OPENIMAGEDENOISE_LIBRARY4 NAMES OpenImageDenoise PATHS ${DEP_LIB_LOCATION} NO_DEFAULT_PATH)
 
 qt_add_executable(qlmdenoiser
     qlmdenoiser.cpp
@@ -21,7 +23,7 @@ qt_add_executable(qlmdenoiser
 )
 
 target_include_directories(qlmdenoiser PRIVATE
-    deps/include
+    build/install/include
 )
 
 target_link_libraries(qlmdenoiser PUBLIC
