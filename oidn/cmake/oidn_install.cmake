@@ -34,7 +34,6 @@ install(DIRECTORY include/OpenImageDenoise
 install(
   FILES
     ${PROJECT_SOURCE_DIR}/README.md
-    ${PROJECT_SOURCE_DIR}/readme.pdf
     ${PROJECT_SOURCE_DIR}/CHANGELOG.md
     ${PROJECT_SOURCE_DIR}/LICENSE.txt
     ${PROJECT_SOURCE_DIR}/third-party-programs.txt
