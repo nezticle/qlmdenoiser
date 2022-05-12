@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(qlmdenoiser LANGUAGES CXX)
+project(qlmdenoiser LANGUAGES C CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -23,7 +23,8 @@ if(NOT OPENIMAGEDENOISE_FOUND)
 endif()
 
 qt_add_executable(qlmdenoiser
-    main.cpp
+    qlmdenoiser.cpp
+    miniz.c
 )
 
 target_include_directories(qlmdenoiser PRIVATE
