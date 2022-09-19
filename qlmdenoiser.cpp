@@ -54,6 +54,7 @@
 #include <QCommandLineParser>
 #include <QTemporaryDir>
 #include <QDir>
+#include <QLibraryInfo>
 #include <OpenImageDenoise/oidn.h>
 
 #define TINYEXR_IMPLEMENTATION
