@@ -71,11 +71,6 @@ static void printError(const char *msg, ...)
     va_end(arglist);
 }
 
-static inline QString tempFilePath(const QTemporaryDir &tempDir, const QString &filename)
-{
-    return tempDir.path() + QLatin1String("/") + filename;
-}
-
 static void toRGBAndAlpha(const float *rgba, QByteArray *rgb, QByteArray *alpha, int width, int height)
 {
     const float *inP = rgba;
@@ -109,7 +104,7 @@ static void combineRGBAndAlpha(const char *rgb, const char *alpha, QByteArray *r
 
 }
 
-static bool processFile(const QString &fn, OIDNDeviceImpl *device, QTemporaryDir &tempDir)
+static bool processFile(const QString &fn, OIDNDeviceImpl *device)
 {
     const QByteArray inFilename = fn.toUtf8();
     float *inOrigData = nullptr;
@@ -147,10 +142,9 @@ static bool processFile(const QString &fn, OIDNDeviceImpl *device, QTemporaryDir
     QByteArray rgba(width * height * 4 * sizeof(float), Qt::Uninitialized);
     combineRGBAndAlpha(outData.constData(), alpha.constData(), &rgba, width, height);
 
-    const QString outFilePath = tempFilePath(tempDir, fn);
-    const QByteArray outFn = outFilePath.toUtf8();
+    const QString tempFn = QDir::tempPath() + QLatin1String("/") + QFileInfo(fn).fileName();
     qDebug("Saving");
-    if (SaveEXR(reinterpret_cast<const float *>(rgba.constData()), width, height, 4, false, outFn.constData(), &err) < 0) {
+    if (SaveEXR(reinterpret_cast<const float *>(rgba.constData()), width, height, 4, false, tempFn.toUtf8().constData(), &err) < 0) {
         printError("Failed to save EXR image: %s", err);
         return false;
     }
@@ -159,16 +153,17 @@ static bool processFile(const QString &fn, OIDNDeviceImpl *device, QTemporaryDir
         printError("Failed to remove source file");
         return false;
     }
-    if (!QDir().rename(outFilePath, fn)) {
+    if (!QDir().rename(tempFn, fn)) {
         printError("Rename failed");
         return false;
     }
+
 
     qDebug("Done %s", inFilename.constData());
     return true;
 }
 
-static bool processListFile(const QString &fn, OIDNDeviceImpl *device, QTemporaryDir &tempDir)
+static bool processListFile(const QString &fn, OIDNDeviceImpl *device)
 {
     QFile f(fn);
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -182,7 +177,7 @@ static bool processListFile(const QString &fn, OIDNDeviceImpl *device, QTemporar
     for (const QByteArray &file : files) {
         const QByteArray tfile = file.trimmed();
         if (!tfile.isEmpty()) {
-            if (!processFile(tfile, device, tempDir))
+            if (!processFile(QFileInfo(tfile).absoluteFilePath(), device))
                 return false;
         }
     }
@@ -212,21 +207,16 @@ int main(int argc, char **argv)
         return EXIT_SUCCESS;
     }
 
-    QTemporaryDir tempDir;
-    if (!tempDir.isValid()) {
-        printError("Failed to create temporary directory");
-        return EXIT_FAILURE;
-    }
-
     OIDNDeviceImpl *device = oidnNewDevice(OIDN_DEVICE_TYPE_CPU);
     oidnCommitDevice(device);
 
     for (const QString &fn : cmdLineParser.positionalArguments()) {
-        if (QFileInfo(fn).suffix() == QLatin1String("txt")) {
-            if (!processListFile(fn, device, tempDir))
+        const QFileInfo fi(fn);
+        if (fi.suffix() == QLatin1String("txt")) {
+            if (!processListFile(fi.absoluteFilePath(), device))
                 return EXIT_FAILURE;
         } else {
-            if (!processFile(fn, device, tempDir))
+            if (!processFile(fi.absoluteFilePath(), device))
                 return EXIT_FAILURE;
         }
     }
