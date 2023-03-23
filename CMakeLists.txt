@@ -20,7 +20,8 @@ else()
 endif()
 
 qt_add_executable(qlmdenoiser
-    qlmdenoiser.cpp
+    main.cpp
+    qdefaultlightmapdenoiser.cpp qdefaultlightmapdenoiser.h
     miniz.c
 )
 
