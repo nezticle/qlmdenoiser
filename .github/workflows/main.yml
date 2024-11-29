@@ -24,7 +24,7 @@ jobs:
         curl -Lo ispc.zip https://github.com/ispc/ispc/releases/download/v1.25.3/ispc-v1.25.3-windows.zip
         unzip ispc.zip -d ispc
     - name: Set up ISPC environment variable
-      run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc-v1.25.3-windows/bin/ispc.exe" >> $GITHUB_ENV
+      run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc-v1.25.3-windows/bin/ispc.exe" | Out-File -FilePath $env:GITHUB_ENV -Append
     - name: Install git-lfs
       run: |
         choco install git-lfs
