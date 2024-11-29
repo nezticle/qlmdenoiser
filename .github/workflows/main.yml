@@ -9,6 +9,8 @@ jobs:
     - uses: ilammy/msvc-dev-cmd@v1
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        lfs: true
     - name: Setup CMake
       uses: lukka/get-cmake@latest
     - name: Setup Ninja
@@ -23,16 +25,24 @@ jobs:
         unzip ispc.zip -d ispc
     - name: Set up ISPC environment variable
       run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc-v1.25.3-windows/bin/ispc.exe" >> $GITHUB_ENV
+    - name: Install git-lfs
+      run: |
+        choco install git-lfs
+        git lfs install
+    - name: Pull LFS objects
+      run: git lfs pull
     - name: Run prepare_deps script
       run: .\prepare_deps.bat
     - name: Build with CMake
-      run: cmake -GNinja -DCMAKE_BUILD_TYPE=Release && ninja
+      run: cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release && nmake
 
   build-macos:
     runs-on: macos-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        lfs: true
     - name: Setup CMake
       uses: lukka/get-cmake@latest
     - name: Setup Ninja
@@ -43,7 +53,13 @@ jobs:
         mkdir -p ispc
         tar -xzf ispc.tar.gz -C ispc
     - name: Set up ISPC environment variable
-      run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc-v1.25.3-macOS/bin/ispc" >> $GITHUB_ENV
+      run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc-v1.25.3-macOS.universal/bin/ispc" >> $GITHUB_ENV
+    - name: Install git-lfs
+      run: |
+        brew install git-lfs
+        git lfs install
+    - name: Pull LFS objects
+      run: git lfs pull
     - name: Run prepare_deps script
       run: ./prepare_deps.sh
     - name: Build with CMake
@@ -54,6 +70,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        lfs: true
     - name: Setup CMake
       run: |
         sudo apt-get update
@@ -67,6 +85,12 @@ jobs:
         tar -xzf ispc.tar.gz -C ispc
     - name: Set up ISPC environment variable
       run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc-v1.25.3-linux/bin/ispc" >> $GITHUB_ENV
+    - name: Install git-lfs
+      run: |
+        sudo apt-get install -y git-lfs
+        git lfs install
+    - name: Pull LFS objects
+      run: git lfs pull
     - name: Run prepare_deps script
       run: ./prepare_deps.sh
     - name: Build with CMake
