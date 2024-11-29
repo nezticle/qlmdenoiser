@@ -4,9 +4,14 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <getopt.h>
 #include <OpenImageDenoise/oidn.h>
 #include "defaultlightmapdenoiser.h"
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <getopt.h>
+#endif
 
 void showHelp(const std::string &appName)
 {
@@ -24,10 +29,42 @@ void showVersion()
               << "." << OIDN_VERSION_MINOR << "." << OIDN_VERSION_PATCH << ")\n";
 }
 
+#ifdef _WIN32
+std::vector<std::string> getCommandLineArgs()
+{
+    std::vector<std::string> args;
+    int argc;
+    LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    for (int i = 0; i < argc; ++i) {
+        char buffer[256];
+        WideCharToMultiByte(CP_UTF8, 0, argv[i], -1, buffer, 256, NULL, NULL);
+        args.push_back(buffer);
+    }
+    LocalFree(argv);
+    return args;
+}
+#endif
+
 int main(int argc, char **argv)
 {
+#ifdef _WIN32
+    std::vector<std::string> args = getCommandLineArgs();
+    std::string appName = args[0];
+#else
     std::string appName = argv[0];
+#endif
 
+#ifdef _WIN32
+    for (size_t i = 1; i < args.size(); ++i) {
+        if (args[i] == "-h" || args[i] == "--help") {
+            showHelp(appName);
+            return EXIT_SUCCESS;
+        } else if (args[i] == "-v" || args[i] == "--version") {
+            showVersion();
+            return EXIT_SUCCESS;
+        }
+    }
+#else
     static struct option long_options[] = {
         {"help",    no_argument,       nullptr, 'h'},
         {"version", no_argument,       nullptr, 'v'},
@@ -48,11 +85,18 @@ int main(int argc, char **argv)
                 return EXIT_FAILURE;
         }
     }
+#endif
 
     std::vector<std::string> positionalArguments;
+#ifdef _WIN32
+    for (size_t i = 1; i < args.size(); ++i) {
+        positionalArguments.emplace_back(args[i]);
+    }
+#else
     for (int i = optind; i < argc; i++) {
         positionalArguments.emplace_back(argv[i]);
     }
+#endif
 
     if (positionalArguments.empty()) {
         showHelp(appName);
