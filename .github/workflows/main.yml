@@ -6,6 +6,7 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
+    - uses: ilammy/msvc-dev-cmd@v1
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Setup CMake
@@ -21,7 +22,7 @@ jobs:
         curl -Lo ispc.zip https://github.com/ispc/ispc/releases/download/v1.25.3/ispc-v1.25.3-windows.zip
         unzip ispc.zip -d ispc
     - name: Set up ISPC environment variable
-      run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc.exe" >> $GITHUB_ENV
+      run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc-v1.25.3-windows/bin/ispc.exe" >> $GITHUB_ENV
     - name: Run prepare_deps script
       run: .\prepare_deps.bat
     - name: Build with CMake
@@ -42,7 +43,7 @@ jobs:
         mkdir -p ispc
         tar -xzf ispc.tar.gz -C ispc
     - name: Set up ISPC environment variable
-      run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc" >> $GITHUB_ENV
+      run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc-v1.25.3-macOS/bin/ispc" >> $GITHUB_ENV
     - name: Run prepare_deps script
       run: ./prepare_deps.sh
     - name: Build with CMake
@@ -65,7 +66,7 @@ jobs:
         mkdir -p ispc
         tar -xzf ispc.tar.gz -C ispc
     - name: Set up ISPC environment variable
-      run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc" >> $GITHUB_ENV
+      run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc-v1.25.3-linux/bin/ispc" >> $GITHUB_ENV
     - name: Run prepare_deps script
       run: ./prepare_deps.sh
     - name: Build with CMake
