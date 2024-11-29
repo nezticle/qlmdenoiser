@@ -35,6 +35,11 @@ jobs:
       run: .\prepare_deps.bat
     - name: Build with CMake
       run: cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release && nmake
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-binary
+        path: qlmdenoiser.exe
 
   build-macos:
     runs-on: macos-latest
@@ -64,6 +69,11 @@ jobs:
       run: ./prepare_deps.sh
     - name: Build with CMake
       run: cmake -GNinja -DCMAKE_BUILD_TYPE=Release && ninja
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: macos-binary
+        path: qlmdenoiser
 
   build-linux:
     runs-on: ubuntu-latest
@@ -95,3 +105,67 @@ jobs:
       run: ./prepare_deps.sh
     - name: Build with CMake
       run: cmake -GNinja -DCMAKE_BUILD_TYPE=Release && ninja
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: linux-binary
+        path: qlmdenoiser
+
+  release:
+    needs: [build-windows, build-macos, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Download Windows binary
+      uses: actions/download-artifact@v2
+      with:
+        name: windows-binary
+        path: ./build/windows
+    - name: Download macOS binary
+      uses: actions/download-artifact@v2
+      with:
+        name: macos-binary
+        path: ./build/macos
+    - name: Download Linux binary
+      uses: actions/download-artifact@v2
+      with:
+        name: linux-binary
+        path: ./build/linux
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+    - name: Upload Windows binary
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./build/windows/qlmdenoiser.exe
+        asset_name: qlmdenoiser.exe
+        asset_content_type: application/octet-stream
+    - name: Upload macOS binary
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./build/macos/qlmdenoiser
+        asset_name: qlmdenoiser
+        asset_content_type: application/octet-stream
+    - name: Upload Linux binary
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./build/linux/qlmdenoiser
+        asset_name: qlmdenoiser
+        asset_content_type: application/octet-stream
