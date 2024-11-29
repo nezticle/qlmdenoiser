@@ -124,17 +124,27 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: windows-binary
-        path: ./build/windows
+        path: build/windows
+    - name: Create Windows zip
+      run: |
+        ls -R
+        zip -j qlmdenoiser-windows-${{ github.ref_name }}.zip build/windows/qlmdenoiser.exe
     - name: Download macOS binary
       uses: actions/download-artifact@v4
       with:
         name: macos-binary
-        path: ./build/macos
+        path: build/macos
+    - name: Create macOS tar.gz
+      run: |
+        tar -czvf qlmdenoiser-macos-${{ github.ref_name }}.tar.gz -C ./build/macos qlmdenoiser
     - name: Download Linux binary
       uses: actions/download-artifact@v4
       with:
         name: linux-binary
-        path: ./build/linux
+        path: build/linux
+    - name: Create Linux tar.gz
+      run: |
+        tar -czvf qlmdenoiser-linux-${{ github.ref_name }}.tar.gz -C ./build/linux qlmdenoiser
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -145,30 +155,30 @@ jobs:
         release_name: Release ${{ github.ref }}
         draft: false
         prerelease: false
-    - name: Upload Windows binary
+    - name: Upload Windows zip
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./build/windows/qlmdenoiser.exe
-        asset_name: qlmdenoiser.exe
-        asset_content_type: application/octet-stream
-    - name: Upload macOS binary
+        asset_path: ./qlmdenoiser-windows-${{ github.ref_name }}.zip
+        asset_name: qlmdenoiser-windows-${{ github.ref_name }}.zip
+        asset_content_type: application/zip
+    - name: Upload macOS tar.gz
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./build/macos/qlmdenoiser
-        asset_name: qlmdenoiser
-        asset_content_type: application/octet-stream
-    - name: Upload Linux binary
+        asset_path: ./qlmdenoiser-macos-${{ github.ref_name }}.tar.gz
+        asset_name: qlmdenoiser-macos-${{ github.ref_name }}.tar.gz
+        asset_content_type: application/gzip
+    - name: Upload Linux tar.gz
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./build/linux/qlmdenoiser
-        asset_name: qlmdenoiser
-        asset_content_type: application/octet-stream
+        asset_path: ./qlmdenoiser-linux-${{ github.ref_name }}.tar.gz
+        asset_name: qlmdenoiser-linux-${{ github.ref_name }}.tar.gz
+        asset_content_type: application/gzip
