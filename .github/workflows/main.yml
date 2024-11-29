@@ -9,7 +9,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Setup CMake
-      uses: lukka/get-cmake@v3
+      uses: lukka/get-cmake@latest
     - name: Setup Ninja
       uses: actions/setup-node@v2
       with:
@@ -33,12 +33,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Setup CMake
-      uses: lukka/get-cmake@v3
+      uses: lukka/get-cmake@latest
     - name: Setup Ninja
       run: brew install ninja
     - name: Download ISPC
       run: |
         curl -Lo ispc.tar.gz https://github.com/ispc/ispc/releases/download/v1.25.3/ispc-v1.25.3-macOS.universal.tar.gz
+        mkdir -p ispc
         tar -xzf ispc.tar.gz -C ispc
     - name: Set up ISPC environment variable
       run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc" >> $GITHUB_ENV
@@ -61,6 +62,7 @@ jobs:
     - name: Download ISPC
       run: |
         curl -Lo ispc.tar.gz https://github.com/ispc/ispc/releases/download/v1.25.3/ispc-v1.25.3-linux.tar.gz
+        mkdir -p ispc
         tar -xzf ispc.tar.gz -C ispc
     - name: Set up ISPC environment variable
       run: echo "ISPC_EXECUTABLE=$(pwd)/ispc/ispc" >> $GITHUB_ENV
