@@ -1,14 +1,11 @@
 cmake_minimum_required(VERSION 3.14)
 project(qlmdenoiser LANGUAGES C CXX)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
-
-find_package(Qt6 COMPONENTS Core)
-find_package(Qt6 COMPONENTS Gui)
 
 if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
     message(FATAL_ERROR "64-bit only")
@@ -19,9 +16,9 @@ else()
     set(QLM_ARCH "X64")
 endif()
 
-qt_add_executable(qlmdenoiser
+add_executable(qlmdenoiser
     main.cpp
-    qdefaultlightmapdenoiser.cpp qdefaultlightmapdenoiser.h
+    defaultlightmapdenoiser.cpp defaultlightmapdenoiser.h
     miniz.c
 )
 
@@ -42,8 +39,6 @@ endif()
 find_library(OPENIMAGEDENOISE_LIBRARY4 NAMES OpenImageDenoise PATHS ${DEP_LIB_LOCATION} NO_DEFAULT_PATH)
 
 target_link_libraries(qlmdenoiser PUBLIC
-    Qt::Core
-    Qt::Gui
     ${OPENIMAGEDENOISE_LIBRARY4}
     ${OPENIMAGEDENOISE_LIBRARY3}
     ${OPENIMAGEDENOISE_LIBRARY2}
